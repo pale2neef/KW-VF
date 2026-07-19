@@ -1,0 +1,14 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "buildCommand": "BASE_PATH=/ PORT=3000 pnpm --filter @workspace/virtual-fitting run build && pnpm --filter @workspace/api-server run build"
+  },
+  "deploy": {
+    "preDeployCommand": "pnpm --filter @workspace/db run push-force",
+    "startCommand": "pnpm --filter @workspace/api-server run start",
+    "healthcheckPath": "/api/healthz",
+    "healthcheckTimeout": 120,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 3
+  }
+}
