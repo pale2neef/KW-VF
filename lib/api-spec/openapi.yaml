@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Virtual Fitting Room API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: try-on
+    description: Virtual try-on operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /try-on:
+    post:
+      operationId: createTryOn
+      tags: [try-on]
+      summary: Create a virtual try-on job
+      description: Upload a person photo and clothing images to create a virtual try-on
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/TryOnInput"
+      responses:
+        "201":
+          description: Try-on job created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TryOnJob"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /try-on/{id}:
+    get:
+      operationId: getTryOn
+      tags: [try-on]
+      summary: Get try-on job status and result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Try-on job details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TryOnJob"
+        "404":
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +88,55 @@ components:
       required:
         - status
 
+    TryOnInput:
+      type: object
+      properties:
+        personPhoto:
+          type: string
+          format: binary
+          description: Photo of the person to try clothes on
+        clothingImages:
+          type: array
+          items:
+            type: string
+            format: binary
+          description: One or more clothing item images (upper and/or lower body)
+      required:
+        - personPhoto
+        - clothingImages
+
+    TryOnJob:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        resultImageUrl:
+          type: ["string", "null"]
+          description: URL of the generated try-on image when completed
+        error:
+          type: ["string", "null"]
+          description: Error message if job failed
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - status
+        - resultImageUrl
+        - error
+        - createdAt
+        - updatedAt
+
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
