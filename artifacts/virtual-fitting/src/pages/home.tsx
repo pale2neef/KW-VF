@@ -4,7 +4,7 @@ import { FileUploadZone } from "@/components/ui/file-upload-zone";
 import { Spinner } from "@/components/ui/spinner";
 import { Progress } from "@/components/ui/progress";
 import { useGetTryOn, getGetTryOnQueryKey } from "@workspace/api-client-react";
-import { AlertCircle, CheckCircle2, Sparkles, RefreshCcw, Truck, BookImage, List } from "lucide-react";
+import { AlertCircle, CheckCircle2, Sparkles, RefreshCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
@@ -120,20 +120,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Feature columns */}
-          <div className="hidden md:flex gap-10 flex-1 justify-center">
-            {[
-              { icon: <BookImage size={32} />, title: "Logo's", desc: "Heeft u een logo dat u wilt laten bedrukken? Neem contact met ons op om de mogelijkheden te bespreken." },
-              { icon: <Truck size={32} />, title: "Retourneren", desc: "Wilt u iets retour sturen? Download hier het retourformulier en stuur het volledig ingevuld mee." },
-              { icon: <List size={32} />, title: "Mega Collectie", desc: "Wij voeren tienduizenden artikelen van circa 40 preferred suppliers. Staat iets er niet bij? Neem contact op!" },
-            ].map(item => (
-              <div key={item.title} className="flex flex-col items-center text-center max-w-[180px] gap-2">
-                <div style={{ color: "#3d7dc8" }}>{item.icon}</div>
-                <div style={{ fontWeight: 700, fontSize: "14px", color: "#3d7dc8" }}>{item.title}</div>
-                <p style={{ fontSize: "12px", color: "#666", lineHeight: 1.5 }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </header>
 
