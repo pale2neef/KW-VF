@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Virtual Fitting Room"
+version = "1.0.0"
+id = "artifacts/virtual-fitting"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20077
+
+[services.development]
+run = "pnpm --filter @workspace/virtual-fitting run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/virtual-fitting", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/virtual-fitting/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20077"
+BASE_PATH = "/"
