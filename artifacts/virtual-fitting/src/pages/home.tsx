@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { FileUploadZone } from "@/components/ui/file-upload-zone";
 import { Spinner } from "@/components/ui/spinner";
 import { Progress } from "@/components/ui/progress";
 import { useGetTryOn, getGetTryOnQueryKey } from "@workspace/api-client-react";
-import { AlertCircle, CheckCircle2, Sparkles, RefreshCcw } from "lucide-react";
+import { AlertCircle, CheckCircle2, Sparkles, RefreshCcw, Truck, BookImage, List } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
@@ -30,7 +29,7 @@ export default function Home() {
 
   const jobStatus = job?.status;
   const isProcessing = jobStatus === "pending" || jobStatus === "processing" || isSubmitting;
-  
+
   // Progress animation while processing
   useEffect(() => {
     if (isProcessing && uploadProgress < 90) {
@@ -55,29 +54,25 @@ export default function Home() {
       const formData = new FormData();
       formData.append("personPhoto", personPhotoFile[0]);
       clothingFiles.forEach(f => formData.append("clothingImages", f));
-      
+
       const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
-      
-      // Simulate slight delay for progress bar
       setUploadProgress(15);
-      
-      const res = await fetch(`${BASE}/api/try-on`, { 
-        method: "POST", 
-        body: formData 
+
+      const res = await fetch(`${BASE}/api/try-on`, {
+        method: "POST",
+        body: formData
       });
-      
-      if (!res.ok) {
-        throw new Error("Failed to start try-on process");
-      }
-      
+
+      if (!res.ok) throw new Error("Kon paskamer niet starten");
+
       const newJob = await res.json();
       setJobId(newJob.id);
       setUploadProgress(40);
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error("Upload fout:", error);
       toast({
-        title: "Submission Failed",
-        description: "We couldn't start your fitting room session. Please try again.",
+        title: "Verzending mislukt",
+        description: "Uw paskamersessie kon niet worden gestart. Probeer het opnieuw.",
         variant: "destructive",
       });
     } finally {
@@ -95,195 +90,314 @@ export default function Home() {
   const isReadyToSubmit = clothingFiles.length > 0 && personPhotoFile.length > 0 && !isProcessing;
 
   return (
-    <div className="min-h-[100dvh] w-full bg-background flex flex-col font-sans">
-      {/* Header / Nav area */}
-      <header className="w-full border-b bg-card/50 backdrop-blur-md sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary text-primary-foreground flex items-center justify-center rounded-sm">
-              <span className="font-serif italic font-bold text-lg">A</span>
+    <div className="min-h-[100dvh] w-full flex flex-col" style={{ background: "#fff", fontFamily: "'Open Sans', sans-serif", color: "#333" }}>
+
+      {/* Top bar */}
+      <div style={{ background: "#f5f5f5", borderBottom: "1px solid #e0e0e0" }}>
+        <div className="max-w-6xl mx-auto px-6 py-1 flex gap-4 text-xs" style={{ color: "#666" }}>
+          <span>Levering</span>
+          <span style={{ color: "#ccc" }}>|</span>
+          <span>Privacybeleid</span>
+        </div>
+      </div>
+
+      {/* Header */}
+      <header style={{ background: "#fff", borderBottom: "2px solid #e8e8e8" }}>
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
+          {/* Logo */}
+          <div className="flex items-center gap-0 shrink-0">
+            <div style={{
+              border: "2px solid #3d7dc8",
+              borderRadius: "4px",
+              padding: "6px 14px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}>
+              <span style={{ fontWeight: 700, fontSize: "15px", color: "#3d7dc8", letterSpacing: "0.5px" }}>Atelier</span>
+              <span style={{ color: "#ccc", fontSize: "18px", fontWeight: 300 }}>/</span>
+              <span style={{ fontWeight: 700, fontSize: "15px", color: "#3d7dc8", letterSpacing: "0.5px" }}>Paskamer</span>
             </div>
-            <span className="font-serif text-lg font-medium tracking-wide">Atelier</span>
           </div>
-          <div className="text-sm font-medium text-muted-foreground hidden sm:block">
-            Corporate Wardrobe Fitting Room
+
+          {/* Feature columns */}
+          <div className="hidden md:flex gap-10 flex-1 justify-center">
+            {[
+              { icon: <BookImage size={32} />, title: "Logo's", desc: "Heeft u een logo dat u wilt laten bedrukken? Neem contact met ons op om de mogelijkheden te bespreken." },
+              { icon: <Truck size={32} />, title: "Retourneren", desc: "Wilt u iets retour sturen? Download hier het retourformulier en stuur het volledig ingevuld mee." },
+              { icon: <List size={32} />, title: "Mega Collectie", desc: "Wij voeren tienduizenden artikelen van circa 40 preferred suppliers. Staat iets er niet bij? Neem contact op!" },
+            ].map(item => (
+              <div key={item.title} className="flex flex-col items-center text-center max-w-[180px] gap-2">
+                <div style={{ color: "#3d7dc8" }}>{item.icon}</div>
+                <div style={{ fontWeight: 700, fontSize: "14px", color: "#3d7dc8" }}>{item.title}</div>
+                <p style={{ fontSize: "12px", color: "#666", lineHeight: 1.5 }}>{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-5xl mx-auto px-6 py-12 md:py-16 flex flex-col gap-16">
-        
-        {/* Hero Section */}
-        <section className="max-w-2xl text-center mx-auto space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <h1 className="font-serif text-4xl md:text-5xl font-medium tracking-tight text-foreground">
-            Visualize your corporate look.
+      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-10 flex flex-col gap-10">
+
+        {/* Page heading */}
+        <section className="text-center">
+          <h1 style={{ fontWeight: 700, fontSize: "clamp(22px, 4vw, 32px)", color: "#3d7dc8", marginBottom: "8px" }}>
+            Kleding voor Professionals door Professionals
           </h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Upload a photo of yourself and the garments you wish to try. 
-            Our digital tailoring service will prepare a preview of your selected attire.
+          <div style={{ width: "60px", height: "3px", background: "#3d7dc8", margin: "0 auto 16px" }} />
+          <p style={{ fontSize: "14px", color: "#555", maxWidth: "720px", margin: "0 auto", lineHeight: 1.7 }}>
+            Atelier/Paskamer is uw digitale kledinghulp. Upload een foto van uzelf en de kledingstukken die u wilt passen. 
+            Onze digitale kleermaker past de kleding op uw foto — geheel op maat, zonder paskamer.
+          </p>
+          <p style={{ fontSize: "14px", color: "#555", maxWidth: "720px", margin: "8px auto 0", lineHeight: 1.7 }}>
+            Een uitstekende keuze is te maken uit onze collectie bedrijfskleding. Staat iets er niet direct bij? 
+            Mail of bel ons dan gerust.
           </p>
         </section>
 
-        {/* Upload Section */}
-        <section className="w-full animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 fill-mode-both">
-          <Card className="border-none shadow-xl bg-card overflow-hidden">
-            <div className="h-2 bg-gradient-to-r from-secondary via-primary to-secondary opacity-20" />
-            <CardContent className="p-8 md:p-10">
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-                {/* Left: Clothing */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-serif text-2xl font-medium">1. Select Attire</h2>
-                  </div>
+        {/* In de spotlight */}
+        <section>
+          <h2 style={{ fontWeight: 700, fontSize: "22px", color: "#3d7dc8", textAlign: "center", marginBottom: "24px" }}>
+            In de paskamer
+          </h2>
+
+          {/* Upload card */}
+          <div style={{
+            background: "#fff",
+            border: "1px solid #dce4ee",
+            borderRadius: "4px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+            overflow: "hidden",
+          }}>
+            {/* Blue top stripe */}
+            <div style={{ height: "4px", background: "#3d7dc8" }} />
+
+            <div className="p-6 md:p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Clothing */}
+                <div>
+                  <h3 style={{ fontWeight: 700, fontSize: "16px", color: "#3d7dc8", marginBottom: "12px" }}>
+                    1. Selecteer kleding
+                  </h3>
                   <FileUploadZone
-                    title="Upload Garments"
-                    description="Drop images of shirts, blazers, trousers or skirts (JPG, PNG)."
+                    title="Upload kleding"
+                    description="Sleep afbeeldingen van shirts, blazers, broeken of rokken hierheen (JPG, PNG)."
                     accept="image/jpeg, image/png, image/webp"
                     multiple={true}
                     files={clothingFiles}
                     onChange={setClothingFiles}
-                    className="min-h-[280px]"
+                    className="min-h-[260px]"
                   />
                 </div>
 
-                {/* Right: Person */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-serif text-2xl font-medium">2. Your Portrait</h2>
-                  </div>
+                {/* Portrait */}
+                <div>
+                  <h3 style={{ fontWeight: 700, fontSize: "16px", color: "#3d7dc8", marginBottom: "12px" }}>
+                    2. Uw portretfoto
+                  </h3>
                   <FileUploadZone
-                    title="Upload Your Photo"
-                    description="A clear, well-lit portrait or full-body photo facing forward."
+                    title="Upload uw foto"
+                    description="Een duidelijke, goed belichte portret- of staandefoto, recht naar voren."
                     accept="image/jpeg, image/png, image/webp"
                     multiple={false}
                     files={personPhotoFile}
                     onChange={setPersonPhotoFile}
-                    className="min-h-[280px]"
+                    className="min-h-[260px]"
                   />
                 </div>
               </div>
 
-              {/* Action Area */}
-              <div className="mt-12 flex flex-col items-center justify-center space-y-6 pt-8 border-t border-border/50">
-                <Button 
-                  size="lg" 
-                  onClick={handleTryOn} 
+              {/* Action */}
+              <div className="mt-8 flex flex-col items-center gap-4" style={{ borderTop: "1px solid #e8e8e8", paddingTop: "24px" }}>
+                <button
+                  onClick={handleTryOn}
                   disabled={!isReadyToSubmit || isProcessing}
-                  className="w-full sm:w-auto min-w-[240px] font-serif tracking-wide text-lg shadow-md transition-all hover:shadow-xl hover:-translate-y-0.5"
+                  style={{
+                    background: isReadyToSubmit && !isProcessing ? "#3d7dc8" : "#a0b8d8",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "3px",
+                    padding: "12px 36px",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    cursor: isReadyToSubmit && !isProcessing ? "pointer" : "not-allowed",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    transition: "background 0.2s",
+                    minWidth: "220px",
+                    justifyContent: "center",
+                  }}
                 >
                   {isProcessing ? (
-                    <span className="flex items-center gap-2">
-                      <Spinner size="sm" className="text-primary-foreground/70" />
-                      Preparing Fitting Room...
-                    </span>
+                    <>
+                      <Spinner size="sm" />
+                      Paskamer wordt voorbereid...
+                    </>
                   ) : (
-                    <span className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5" />
-                      Enter Fitting Room
-                    </span>
+                    <>
+                      <Sparkles size={18} />
+                      Ga naar de paskamer
+                    </>
                   )}
-                </Button>
-                
-                {(!isReadyToSubmit && !isProcessing && !jobId) && (
-                  <p className="text-sm text-muted-foreground text-center">
-                    Please provide both garment and portrait photos to proceed.
+                </button>
+
+                {!isReadyToSubmit && !isProcessing && !jobId && (
+                  <p style={{ fontSize: "13px", color: "#888" }}>
+                    Upload zowel kledingfoto('s) als een portretfoto om verder te gaan.
                   </p>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </section>
 
-        {/* Results Section */}
+        {/* Results */}
         {jobId && (
-          <section className="w-full pb-16 animate-in fade-in slide-in-from-bottom-12 duration-1000 fill-mode-both">
-            <div className="flex items-center justify-center mb-8">
-              <div className="h-px bg-border flex-1 max-w-[100px]"></div>
-              <span className="mx-4 font-serif italic text-muted-foreground">The Result</span>
-              <div className="h-px bg-border flex-1 max-w-[100px]"></div>
-            </div>
+          <section>
+            <h2 style={{ fontWeight: 700, fontSize: "22px", color: "#3d7dc8", textAlign: "center", marginBottom: "24px" }}>
+              Het Resultaat
+            </h2>
 
-            <Card className="border-none shadow-2xl bg-card overflow-hidden relative">
+            <div style={{
+              background: "#fff",
+              border: "1px solid #dce4ee",
+              borderRadius: "4px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              overflow: "hidden",
+              minHeight: "320px",
+            }}>
               {isProcessing && (
-                <div className="absolute top-0 left-0 w-full h-1 z-20">
+                <div style={{ height: "4px" }}>
                   <Progress value={uploadProgress} className="h-full rounded-none" />
                 </div>
               )}
-              
-              <CardContent className="p-0 min-h-[400px] flex flex-col items-center justify-center text-center">
-                
+
+              <div className="flex flex-col items-center justify-center p-10 text-center" style={{ minHeight: "300px" }}>
+
                 {isProcessing && (
-                  <div className="p-12 flex flex-col items-center space-y-6 animate-pulse">
-                    <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center">
-                      <Spinner size="lg" className="text-primary" />
+                  <div className="flex flex-col items-center gap-5">
+                    <div style={{
+                      width: "64px", height: "64px", borderRadius: "50%",
+                      background: "#e8f0fb", display: "flex", alignItems: "center", justifyContent: "center"
+                    }}>
+                      <Spinner size="lg" />
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="font-serif text-2xl font-medium">Digital Tailoring in Progress</h3>
-                      <p className="text-muted-foreground max-w-md mx-auto">
-                        Please hold while we perfectly fit your selected garments to your portrait. This usually takes a moment.
+                    <div>
+                      <h3 style={{ fontWeight: 700, fontSize: "18px", color: "#3d7dc8", marginBottom: "8px" }}>
+                        Digitaal passen bezig…
+                      </h3>
+                      <p style={{ fontSize: "14px", color: "#666", maxWidth: "400px", lineHeight: 1.6 }}>
+                        Even geduld terwijl wij de geselecteerde kleding op uw foto passen. Dit duurt gewoonlijk even.
                       </p>
                     </div>
                   </div>
                 )}
 
                 {jobStatus === "completed" && job?.resultImageUrl && (
-                  <div className="w-full animate-in fade-in duration-1000">
-                    <div className="bg-secondary/20 p-8 flex items-center justify-center">
-                      <div className="relative max-w-2xl w-full mx-auto rounded-xl overflow-hidden shadow-xl ring-1 ring-border">
-                        <img 
-                          src={job.resultImageUrl} 
-                          alt="Your virtual fitting result" 
-                          className="w-full h-auto object-contain bg-background"
-                        />
-                      </div>
+                  <div className="w-full">
+                    <div style={{ background: "#f5f8fc", padding: "24px", display: "flex", justifyContent: "center" }}>
+                      <img
+                        src={job.resultImageUrl}
+                        alt="Uw virtueel paskamerresultaat"
+                        style={{
+                          maxWidth: "480px",
+                          width: "100%",
+                          borderRadius: "4px",
+                          boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+                          border: "1px solid #dce4ee",
+                        }}
+                      />
                     </div>
-                    <div className="p-8 bg-card flex flex-col sm:flex-row items-center justify-between gap-4 border-t">
-                      <div className="flex items-center gap-3 text-primary">
-                        <CheckCircle2 className="w-5 h-5" />
-                        <span className="font-medium">Fitting complete</span>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-8 py-5"
+                      style={{ borderTop: "1px solid #e8e8e8" }}>
+                      <div className="flex items-center gap-2" style={{ color: "#3d7dc8", fontWeight: 600, fontSize: "14px" }}>
+                        <CheckCircle2 size={18} />
+                        Passen voltooid
                       </div>
-                      <div className="flex gap-3 w-full sm:w-auto">
-                        <Button variant="outline" onClick={handleReset} className="flex-1 sm:flex-none">
-                          <RefreshCcw className="w-4 h-4 mr-2" />
-                          Try Another Look
-                        </Button>
-                        <Button className="flex-1 sm:flex-none">
-                          Save to Wardrobe
-                        </Button>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleReset}
+                          style={{
+                            background: "#fff",
+                            border: "1px solid #3d7dc8",
+                            color: "#3d7dc8",
+                            borderRadius: "3px",
+                            padding: "8px 20px",
+                            fontSize: "13px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                          }}
+                        >
+                          <RefreshCcw size={14} />
+                          Probeer een andere outfit
+                        </button>
+                        <button
+                          style={{
+                            background: "#3d7dc8",
+                            border: "none",
+                            color: "#fff",
+                            borderRadius: "3px",
+                            padding: "8px 20px",
+                            fontSize: "13px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Opslaan in garderobe
+                        </button>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {(jobStatus === "failed" || isError) && (
-                  <div className="p-12 flex flex-col items-center space-y-6">
-                    <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
-                      <AlertCircle className="w-8 h-8 text-destructive" />
+                  <div className="flex flex-col items-center gap-5">
+                    <div style={{
+                      width: "64px", height: "64px", borderRadius: "50%",
+                      background: "#fde8e8", display: "flex", alignItems: "center", justifyContent: "center"
+                    }}>
+                      <AlertCircle size={28} style={{ color: "#c53030" }} />
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="font-serif text-2xl font-medium text-destructive">Fitting Interrupted</h3>
-                      <p className="text-muted-foreground max-w-md mx-auto">
-                        {job?.error || "We encountered an issue while processing your images. This sometimes happens with unclear photos."}
+                    <div>
+                      <h3 style={{ fontWeight: 700, fontSize: "18px", color: "#c53030", marginBottom: "8px" }}>
+                        Passen onderbroken
+                      </h3>
+                      <p style={{ fontSize: "14px", color: "#666", maxWidth: "400px", lineHeight: 1.6 }}>
+                        {job?.error || "Er is een probleem opgetreden bij het verwerken van uw afbeeldingen. Dit kan soms gebeuren bij onduidelijke foto's."}
                       </p>
                     </div>
-                    <Button variant="outline" onClick={() => setJobId(null)} className="mt-4">
-                      Return to Uploads
-                    </Button>
+                    <button
+                      onClick={() => setJobId(null)}
+                      style={{
+                        background: "#fff",
+                        border: "1px solid #3d7dc8",
+                        color: "#3d7dc8",
+                        borderRadius: "3px",
+                        padding: "8px 20px",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        marginTop: "8px",
+                      }}
+                    >
+                      Terug naar uploads
+                    </button>
                   </div>
                 )}
 
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </section>
         )}
 
       </main>
-      
-      <footer className="w-full border-t py-8 mt-auto bg-card text-center">
-        <p className="text-sm text-muted-foreground font-medium">
-          Confidential & Proprietary. For internal employee use only.
-        </p>
+
+      <footer style={{ background: "#3d7dc8", color: "#fff", textAlign: "center", padding: "16px", fontSize: "13px" }}>
+        Vertrouwelijk &amp; eigendomsrecht voorbehouden. Uitsluitend voor intern gebruik door medewerkers.
       </footer>
     </div>
   );
