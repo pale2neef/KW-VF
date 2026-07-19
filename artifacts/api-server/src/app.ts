@@ -9,6 +9,10 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Behind Railway's proxy: derive the real client IP from X-Forwarded-For
+// (required for correct per-IP rate limiting).
+app.set("trust proxy", 1);
+
 app.use(
   pinoHttp({
     logger,

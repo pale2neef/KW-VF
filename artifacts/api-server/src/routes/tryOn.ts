@@ -5,6 +5,7 @@ import OpenAI, { toFile, type Uploadable } from "openai";
 import { db, tryOnJobsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger";
+import { dailyIpRateLimit } from "../middlewares/dailyIpRateLimit";
 
 const router = Router();
 
@@ -95,6 +96,7 @@ Show a full-body or 3/4 view of the person in the new outfit.`;
 // POST /api/try-on
 router.post(
   "/try-on",
+  dailyIpRateLimit,
   upload.fields([
     { name: "personPhoto", maxCount: 1 },
     { name: "clothingImages", maxCount: 8 },
