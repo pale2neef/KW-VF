@@ -19,11 +19,6 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@11.15.0",
-  "pnpm": {
-    "allowedScripts": {
-      "esbuild": ["build"]
-    }
-  }
+  "packageManager": "pnpm@11.15.0"
 }
 
