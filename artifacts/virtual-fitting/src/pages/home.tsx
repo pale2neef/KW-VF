@@ -133,12 +133,9 @@ export default function Home() {
           <div style={{ width: "60px", height: "3px", background: "#3d7dc8", margin: "0 auto 16px" }} />
           <p style={{ fontSize: "14px", color: "#555", maxWidth: "720px", margin: "0 auto", lineHeight: 1.7 }}>
             Atelier/Paskamer is uw digitale kledinghulp. Upload een foto van uzelf en de kledingstukken die u wilt passen. 
-            Onze digitale kleermaker past de kleding op uw foto — geheel op maat, zonder paskamer.
+            
           </p>
-          <p style={{ fontSize: "14px", color: "#555", maxWidth: "720px", margin: "8px auto 0", lineHeight: 1.7 }}>
-            Een uitstekende keuze is te maken uit onze collectie bedrijfskleding. Staat iets er niet direct bij? 
-            Mail of bel ons dan gerust.
-          </p>
+
         </section>
 
         {/* In de spotlight */}
